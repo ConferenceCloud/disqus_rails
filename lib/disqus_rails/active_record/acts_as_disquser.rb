@@ -16,6 +16,28 @@ module DisqusRails
             data[:id] = self.id
           end
 
+          data[:id] = data[:id].to_s
+
+          if attributes.has_key?(:id_suffix)
+            if attributes[:id_suffix].is_a? Proc
+              data[:id] = data[:id].to_s + "-" + (instance_eval &attributes[:id_suffix])
+            elsif attributes[:id_prefix].is_a? Symbol
+              data[:id] = (send attributes[:id_suffix]) + "-" + data[:id].to_s
+            else
+              data[:id] = data[:id].to_s + "-" + attributes[:id_suffix]
+            end
+          end
+
+          if attributes.has_key?(:id_prefix)
+            if attributes[:id_prefix].is_a? Proc
+              data[:id] = (instance_eval &attributes[:id_prefix]) + "-" + data[:id].to_s
+            elsif attributes[:id_prefix].is_a? Symbol
+              data[:id] = (send attributes[:id_prefix]) + "-" + data[:id].to_s
+            else
+              data[:id] = attributes[:id_prefix] + "-" + data[:id].to_s
+            end
+          end
+
           if attributes.has_key?(:username)
             if attributes[:username].is_a? Proc
               data[:username] = instance_eval &attributes[:username]
